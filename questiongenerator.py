@@ -16,12 +16,12 @@ from transformers import (
 
 
 class QuestionGenerator:
-    def __init__(self, model_dir=None):
+    def __init__(self, model_dir=None, token_length=512):
 
         QG_PRETRAINED = "iarfmoose/t5-base-question-generator"
         self.ANSWER_TOKEN = "<answer>"
         self.CONTEXT_TOKEN = "<context>"
-        self.SEQ_LENGTH = 8192
+        self.SEQ_LENGTH = token_length
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -29,7 +29,7 @@ class QuestionGenerator:
         self.qg_model = AutoModelForSeq2SeqLM.from_pretrained(QG_PRETRAINED)
         self.qg_model.to(self.device)
 
-        self.qa_evaluator = QAEvaluator(model_dir)
+        self.qa_evaluator = QAEvaluator(model_dir, token_length=token_length)
 
     def generate(
         self, article, use_evaluator=True, num_questions=None, answer_style="all"
@@ -266,10 +266,10 @@ class QuestionGenerator:
 
 
 class QAEvaluator:
-    def __init__(self, model_dir=None):
+    def __init__(self, model_dir=None, token_length=512):
 
         QAE_PRETRAINED = "iarfmoose/bert-base-cased-qa-evaluator"
-        self.SEQ_LENGTH = 8192
+        self.SEQ_LENGTH = token_length
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
